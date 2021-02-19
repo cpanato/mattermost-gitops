@@ -27,7 +27,9 @@ It expects a config file in the location given by `--auth` that looks like this:
 }
 ```
 
-`authToken` is a value provided by your Mattermost installation, see how to create a [Personal Token](https://docs.mattermost.com/developer/personal-access-tokens.html?#personal-access-tokens)
+`authToken` is a value provided by your Mattermost installation, see how to
+create a [Personal Token](https://docs.mattermost.com/developer/personal-access-tokens.html?#personal-access-tokens)
+
 `instanceUrl` is your Mattermost URL
 
 
