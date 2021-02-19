@@ -14,10 +14,10 @@ type Reconciler struct {
 	channels   channelState
 }
 
-func New(mattermost *model.Client4, config config.Config) *Reconciler {
+func New(mattermost *model.Client4, cfg config.Config) *Reconciler {
 	return &Reconciler{
 		mattermost: mattermost,
-		config:     config,
+		config:     cfg,
 		channels:   channelState{},
 	}
 }

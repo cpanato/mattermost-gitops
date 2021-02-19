@@ -12,7 +12,7 @@ func (r *Reconciler) reconcileChannels() ([]Action, []error) {
 	missingChannels := map[string]*config.Channel{}
 
 	var actions []Action
-	var errors []error
+	var errors []error // nolint: prealloc
 
 	for _, c := range r.channels.byName {
 		missingChannels[c.Name] = c
@@ -22,28 +22,25 @@ func (r *Reconciler) reconcileChannels() ([]Action, []error) {
 		if o, ok := r.channels.byName[c.Name]; ok {
 			if o.DisplayName != c.DisplayName || o.Name != c.Name ||
 				o.Purpose != c.Purpose || o.Header != c.Header {
-				if err := r.channels.update(o.Name, c); err != nil {
-					errors = append(errors, err)
-				} else {
-					actions = append(actions, updateChannelAction{old: *o, new: c})
-				}
+				r.channels.update(o.Name, &c)
+				actions = append(actions, &updateChannelAction{old: *o, new: c})
 			}
 
 			if c.Private != o.Private {
-				actions = append(actions, updateChannelPrivacyAction{old: *o, new: c})
+				actions = append(actions, &updateChannelPrivacyAction{old: *o, new: c})
 			}
 
 			if c.Archive != o.Archive {
 				if c.Archive {
-					actions = append(actions, archiveChannelAction{channelID: o.ChannelID, update: c})
+					actions = append(actions, &archiveChannelAction{channelID: o.ChannelID, update: c})
 				} else {
-					actions = append(actions, unarchiveChannelAction{channelID: o.ChannelID, update: c})
+					actions = append(actions, &unarchiveChannelAction{channelID: o.ChannelID, update: c})
 				}
 			}
 
 			delete(missingChannels, o.Name)
 		} else {
-			actions = append(actions, createChannelAction{c})
+			actions = append(actions, &createChannelAction{c})
 		}
 	}
 
@@ -58,11 +55,11 @@ type createChannelAction struct {
 	config.Channel
 }
 
-func (a createChannelAction) Describe() string {
+func (a *createChannelAction) Describe() string {
 	return fmt.Sprintf("Create new channel: %s/%s", a.Name, a.DisplayName)
 }
 
-func (a createChannelAction) Perform(reconciler *Reconciler) error {
+func (a *createChannelAction) Perform(reconciler *Reconciler) error {
 	channelType := model.CHANNEL_OPEN
 	if a.Private {
 		channelType = model.CHANNEL_PRIVATE
@@ -102,11 +99,11 @@ type unarchiveChannelAction struct {
 	update    config.Channel
 }
 
-func (a unarchiveChannelAction) Describe() string {
+func (a *unarchiveChannelAction) Describe() string {
 	return fmt.Sprintf("Unarchive channel: %s", a.update.Name)
 }
 
-func (a unarchiveChannelAction) Perform(reconciler *Reconciler) error {
+func (a *unarchiveChannelAction) Perform(reconciler *Reconciler) error {
 	_, resp := reconciler.mattermost.RestoreChannel(a.channelID)
 	if resp.Error != nil {
 		log.Fatalf("Failed to restore channel %s: %v\n", a.update.Name, resp.Error.Error())
@@ -120,11 +117,11 @@ type archiveChannelAction struct {
 	update    config.Channel
 }
 
-func (a archiveChannelAction) Describe() string {
+func (a *archiveChannelAction) Describe() string {
 	return fmt.Sprintf("Archive channel: %s", a.update.Name)
 }
 
-func (a archiveChannelAction) Perform(reconciler *Reconciler) error {
+func (a *archiveChannelAction) Perform(reconciler *Reconciler) error {
 	_, resp := reconciler.mattermost.DeleteChannel(a.channelID)
 	if resp.Error != nil {
 		log.Fatalf("Failed to delete channel %s: %v\n", a.update.Name, resp.Error.Error())
@@ -138,7 +135,7 @@ type updateChannelPrivacyAction struct {
 	new config.Channel
 }
 
-func (a updateChannelPrivacyAction) Describe() string {
+func (a *updateChannelPrivacyAction) Describe() string {
 	newType := "Public"
 	if a.new.Private {
 		newType = "Private"
@@ -152,7 +149,7 @@ func (a updateChannelPrivacyAction) Describe() string {
 	return fmt.Sprintf("Channel %s privacy mode update from %s to %s", a.new.Name, oldType, newType)
 }
 
-func (a updateChannelPrivacyAction) Perform(reconciler *Reconciler) error {
+func (a *updateChannelPrivacyAction) Perform(reconciler *Reconciler) error {
 	channelType := model.CHANNEL_OPEN
 	if a.new.Private {
 		channelType = model.CHANNEL_PRIVATE
@@ -170,11 +167,11 @@ type updateChannelAction struct {
 	new config.Channel
 }
 
-func (a updateChannelAction) Describe() string {
+func (a *updateChannelAction) Describe() string {
 	return fmt.Sprintf("Update channel %s from %+v to %+v", a.old.Name, a.old, a.new)
 }
 
-func (a updateChannelAction) Perform(reconciler *Reconciler) error {
+func (a *updateChannelAction) Perform(reconciler *Reconciler) error {
 	patch := &model.ChannelPatch{
 		DisplayName: &a.new.DisplayName,
 		Name:        &a.new.Name,

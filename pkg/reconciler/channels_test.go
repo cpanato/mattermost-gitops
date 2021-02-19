@@ -19,14 +19,14 @@ func TestReconcileChannels(t *testing.T) {
 			name:            "create a new channel",
 			priorChannels:   []config.Channel{{Name: "test"}},
 			newChannels:     []config.Channel{{Name: "honk"}, {Name: "test"}},
-			expectedActions: []Action{createChannelAction{config.Channel{Name: "honk"}}},
+			expectedActions: []Action{&createChannelAction{config.Channel{Name: "honk"}}},
 		},
 		{
 			name:          "update a channel",
 			priorChannels: []config.Channel{{Name: "honk", DisplayName: "test"}},
 			newChannels:   []config.Channel{{Name: "honk", DisplayName: "honk the planet"}},
 			expectedActions: []Action{
-				updateChannelAction{
+				&updateChannelAction{
 					old: config.Channel{
 						Name:        "honk",
 						DisplayName: "test",

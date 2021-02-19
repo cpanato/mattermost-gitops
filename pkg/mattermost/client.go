@@ -12,13 +12,11 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 )
 
-var (
-	insecureSignatureAlgorithms = map[x509.SignatureAlgorithm]bool{
-		x509.SHA1WithRSA:   true,
-		x509.DSAWithSHA1:   true,
-		x509.ECDSAWithSHA1: true,
-	}
-)
+var insecureSignatureAlgorithms = map[x509.SignatureAlgorithm]bool{
+	x509.SHA1WithRSA:   true,
+	x509.DSAWithSHA1:   true,
+	x509.ECDSAWithSHA1: true,
+}
 
 func NewAPIv4Client(instanceURL string, allowInsecureSHA1, allowInsecureTLS bool) *model.Client4 {
 	client := model.NewAPIv4Client(instanceURL)

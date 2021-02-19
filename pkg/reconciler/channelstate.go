@@ -58,13 +58,11 @@ func (c *channelState) init(m *model.Client4, ignoreDefaultChannels bool) error 
 	return nil
 }
 
-func (c *channelState) update(old string, new config.Channel) error {
-	if old != new.Name {
-		c.byName[new.Name] = &new
+func (c *channelState) update(old string, newconfig *config.Channel) {
+	if old != newconfig.Name {
+		c.byName[newconfig.Name] = newconfig
 		delete(c.byName, old)
 	} else {
-		c.byName[old] = &new
+		c.byName[old] = newconfig
 	}
-
-	return nil
 }

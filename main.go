@@ -54,6 +54,7 @@ func main() {
 	p := config.NewParser()
 
 	if stat.IsDir() {
+		// nolint: gocritic
 		// err = p.ParseDir(o.config)
 		// no-op
 	} else {

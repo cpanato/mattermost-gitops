@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v3"
@@ -35,6 +34,7 @@ func (p *Parser) Parse(reader io.Reader, path string) error {
 		return fmt.Errorf("failed to parse yaml: %v", err)
 	}
 
+	// nolint: gocritic
 	// channels, err := mergeChannels(p.Config.Channels, c.Channels)
 	// if err != nil {
 	// 	return fmt.Errorf("couldn't merge channels: %v", err)
@@ -93,14 +93,15 @@ func ParseDir(path string) (Config, error) {
 	return p.Config, nil
 }
 
-func matchesRegexList(s string, tests []*regexp.Regexp) bool {
-	for _, r := range tests {
-		if r.MatchString(s) {
-			return true
-		}
-	}
-	return false
-}
+// nolint: gocritic
+// func matchesRegexList(s string, tests []*regexp.Regexp) bool {
+// 	for _, r := range tests {
+// 		if r.MatchString(s) {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
 // func mergeChannels(a []Channel, b []Channel) ([]Channel, error) {
 // 	names := map[string]struct{}{}
