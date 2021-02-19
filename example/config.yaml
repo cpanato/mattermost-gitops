@@ -5,9 +5,11 @@ channels:
   name: test
   header: testing hearder 2
   purpose: testing purpose
+  archive: false
 - team_id: utaq935c5j8z5x3gwske8bep7c
   private: false
   display_name: "dev: test2"
   name: test1
   header: testing
   purpose: testing purpose
+  archive: false

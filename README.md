@@ -49,6 +49,7 @@ channels:
   name: honk # Channel name
   header: honk the planet # The header for the channel. Optional
   purpose: just to honk # Purpose of the channel. Optional
+  archive: false # if want to archive the channel, if it is already archived can restore
 ```
 
 
